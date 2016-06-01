@@ -12,7 +12,6 @@ x = zeros(N)
 for i in 1:M
 	x[i] = rand(d,1)[1]
 end
-println(x)
 
 for i in M+1:N
 	for j in 1:M
@@ -20,7 +19,6 @@ for i in M+1:N
   end
   x[i] += rand(d,1)[1]
 end
-println(x)
 
 t = 1:N
 plot(x=t,y=x,Geom.line)
@@ -39,12 +37,14 @@ for i in 1:M
     C_m[i,j] = c(abs(j-i))
   end
 end
-println(C_m)
 
 c_m = zeros(M)
 for i in 1:M
 	c_m[i] = c(i)
 end
 
-a_m = inv(C_m)*(c_m)
+a_m = (C_m)\(c_m)
 sigma = c(0) - (c_m)' * a_m
+println(a)
+println(a_m)
+println(sigma)
