@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 M = 3
 a = np.array([0.5,-0.02,-0.4])
@@ -14,10 +13,6 @@ for i in range(M,N):
     for j in range(M):
         x[i] += a[j] * x[i-j-1]
     x[i] += np.random.normal(0,1)
-
-t = np.arange(N)
-plt.plot(t,x)
-plt.show
 
 def c(k):
     ans = 0

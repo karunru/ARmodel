@@ -1,4 +1,3 @@
-using Gadfly
 using Distributions
 
 M = 3
@@ -19,9 +18,6 @@ for i in M+1:N
   end
   x[i] += rand(d,1)[1]
 end
-
-t = 1:N
-plot(x=t,y=x,Geom.line)
 
 function c(k)
   ans = 0
