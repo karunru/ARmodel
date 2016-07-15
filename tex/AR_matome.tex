@@ -1,0 +1,188 @@
+\documentclass[a4j]{jarticle}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\newcommand{\vtr}[1]{\mbox{\boldmath $#1$}}
+
+\makeatletter
+	\renewcommand{\theequation}{%
+  \thesection.\arabic{equation}}
+  \@addtoreset{equation}{section}
+
+\makeatother
+\title{ARモデル}
+\author{山下 滉}
+\date{2016/07/15}
+
+\begin{document}
+
+\maketitle
+
+\section{時系列データ}
+時系列データとは，時間の経過とともに変動する現象の記録である．時系列解析では，各時間に対してある確率分布に従う確率変数であるとみなす．
+\subsection{定常性}
+定常である時系列は，時間によらず発生した確率分布の平均や分散などは変化しないものをいう．
+すなわち，時系列を${y_{1}，y_{2}，\cdots，y_{N}}$，$l$を時間のシフト量を表す任意の整数とするとき
+\begin{eqnarray}
+	{\rm E}[y_{n}] &=& {\rm E}[y_{n-l}] \nonumber \\
+	{\rm Var}[y_{n}] &=& {\rm Var}[y_{n-l}] \nonumber \\
+	{\rm Cov}[y_{n}，y_{m}] &=& {\rm Cov}[y_{n-l}，y_{m-l}]
+\end{eqnarray}
+が成り立つものと仮定する．ここで，${\rm E}[\cdot]$は期待値を，${\rm Var}[\cdot]$は分散を，${\rm Cov}[\cdot，\cdot]$は共分散をそれぞれ表す．
+
+\subsection{定常時系列の自己共分散関数}
+時系列に定常性を仮定すると，平均値${\rm E}[y_{n}]$は時刻$n$に依存しない一定の値となるので
+\begin{equation}
+	\mu = {\rm E}[y_{n}]
+\end{equation}
+と表し，時系列$y_{n}$の平均と呼ぶ．また，$y_{n}$と$y_{n-k}$の共分散${\rm Cov}[y_{n}，y_{n-k}]$は時間差$k$だけに依存する量となるので
+\begin{equation}
+	C_{k} = {\rm Cov}[y_{n}，y_{n-k}] = {\rm E}[(y_{n} - \mu)(y_{n-k} - \mu)]
+\end{equation}
+と表し，定常時系列の自己共分散関数という．自己共分散関数は偶関数$(C_{l} = C_{-l})$である．
+
+\newpage
+\section{ARモデル}
+ARモデルは，時系列データを次の式で表したモデルである．
+\begin{equation}
+	\label{AR}
+	y_{n} = \sum_{i=1}^{M}a_{i}y_{n-i}+\varepsilon_{n}
+\end{equation}
+ここで，$y_{n}$は現在の値，$y_{n-i}$は現在から$i$個前の値，$M$は自己回帰の次数，$a_{i}$は自己回帰係数を表す．
+
+$\varepsilon_{n}$は平均0，分散$\sigma^{2}$の正規分布に従う白色雑音で，次の条件を満たす．
+\begin{eqnarray}
+	\label{whitenoise}
+	{\rm E}[\varepsilon_{n}] &=& 0  \nonumber \\
+	{\rm E}[\varepsilon_{n}^{2}] &=& \sigma^{2} \nonumber  \\
+	{\rm E}[\varepsilon_{n}\varepsilon_{m}] &=& 0， n\neq m \nonumber  \\
+	{\rm E}[\varepsilon_{n}y_{m}] &=& 0， n>m 
+\end{eqnarray}
+
+\section{ユールウォーカー方程式}
+式(\ref{AR})の両辺に$y_{n-k}$をかけて期待値をとると
+\begin{eqnarray}
+	\label{bothE}
+	{\rm E}[y_{n}y_{n-k}] &=&  \sum_{i=1}^{M}a_{i}{\rm E}[y_{n-i}y_{n-k}]+{\rm E}[\varepsilon_{n}y_{n-k}] \nonumber \\
+									&=&  \sum_{i=1}^{M}a_{i}{\rm E}[y_{n}y_{n-k+i}]+{\rm E}[\varepsilon_{n}y_{n-k}]
+\end{eqnarray}
+となる．${\rm E}[y_{n}y_{n-k}]=C_{k}$とおくと
+\begin{equation}
+	C_{0} = \sum_{i=1}^{M}a_{i}{\rm E}[y_{n}y_{n-i}]+{\rm E}[\varepsilon_{n}y_{n}] \nonumber
+\end{equation}
+\begin{eqnarray}
+	{\rm E}[\varepsilon_{n}y_{n}] &=& {\rm E}[\varepsilon_{n}(\sum_{i=1}^{M}a_{i}y_{n-i}+\varepsilon_{n})]  \nonumber \\
+													&=& \sum_{i=1}^{M}a_{i}{\rm E}[\varepsilon_{n}y_{n-i}]+{\rm E}[\varepsilon_{n}^{2}] \nonumber \\
+													&=& 0+\sigma^{2} (\because 式(\ref{whitenoise}) \nonumber
+\end{eqnarray}
+\begin{eqnarray}
+	\label{C0-yule}
+	\therefore C_{0} &=& \sum_{i=1}^{M}a_{i}C_{i}+\sigma^{2} \\
+	\label{Ck-yule}
+	C_{k} &=& \sum_{i=1}^{M}a_{i}C_{k-i}
+\end{eqnarray}
+式(\ref{C0-yule})，式(\ref{Ck-yule})をユールウォーカー方程式という．
+
+\section{ユールウォーカー法によるパラメータ推定}
+時系列データ$y_{1}，y_{2}，\cdots，y_{N}$が与えられた時，ARモデルを当てはめる場合，次数$M$を決定し，
+自己回帰係数$a_{1}，a_{2}，\cdots，a_{M}$と分散$\sigma^{2}$を推定することが必要である．
+ここでは，次数$M$は与えられているものとして話を進める．
+
+$C_{k}={\rm E}[y_{n}y_{n-k}]$より，時系列データが与えられたときの値$\hat{C}_{k}$は
+\begin{eqnarray}
+	\hat{C}_{k} &=& {\rm E}[y_{n}y_{n-k}] \nonumber \\
+							&=& \frac{1}{N} \sum_{n=k+1}^{N} y_{n}y_{n-k}
+\end{eqnarray}
+また，式(\ref{Ck-yule})より
+\begin{equation}
+	\label{vtr-eq}
+	\vtr{C}_{M}\vtr{a}_{M} = \vtr{c}_{M}
+\end{equation}
+ここで
+\begin{equation}
+	\vtr{C}_{M} = \left(
+									\begin{array}{ccccc}
+										\hat{C}_{0} & \hat{C}_{1} & \ldots & \hat{C}_{M-2} & \hat{C}_{M-1} \\
+										\hat{C}_{1} & \hat{C}_{0} & \hat{C}_{1} &          & \hat{C}_{M-2} \\
+										\vdots      & \ddots      & \ddots & \ddots        & \vdots        \\
+										\hat{C}_{M-2} &           & \hat{C}_{1} & \hat{C}_{0} & \hat{C}_{1} \\
+										\hat{C}_{M-1} & \hat{C}_{M-2} & \ldots & \hat{C}_{1} & \hat{C}_{0} \\
+									\end{array}
+								\right)
+\end{equation}
+
+\begin{equation}
+	\vtr{a}_{M} = \left(
+									\begin{array}{c}
+										a_{1} \\
+										a_{2} \\
+										\vdots \\
+										a_{M}
+									\end{array}
+								\right)
+	，\vtr{c}_{M} = \left(
+										\begin{array}{c}
+											\hat{C}_{1} \\
+											\hat{C}_{2} \\
+											\vdots \\
+											\hat{C}_{M}
+										\end{array}
+								 \right)
+\end{equation}
+とする. \\
+式(\ref{vtr-eq})の解を$\hat{\vtr{a}}_{M}$とおくと，$\sigma^{2}$の推定値は式(\ref{C0-yule})より
+\begin{eqnarray}
+	\hat{\sigma^{2}} &=& \hat{C}_{0} - \sum_{i=1}^{M}a_{i}C_{i} \nonumber \\
+									 &=& \hat{C}_{0} - \hat{\vtr{a}}_{M}^{\top}\vtr{C}_{M}
+\end{eqnarray}
+
+\section{AICによる次数の決定}
+ARモデルで求めるパラメータを$\theta = (a_{1}，a_{2}，\cdots，a_{M}，\sigma^{2})^{\top}$と表すことにする．
+式(\ref{AR})のモデルを仮定すると，$y$の平均ベクトルは0，分散共分散行列は式(\ref{Ck-yule})で定まる自己共分散関数$C_{k}$を用いて
+\begin{equation}
+	\Sigma = \left(
+						\begin{array}{cccc}
+							C_{0} & C_{1} & \ldots & C_{N-1} \\
+							C_{1} & C_{0} & \ldots & C_{N-2} \\
+							\vdots & \vdots & \ddots & \vdots \\
+							C_{N-1} & C_{N-2} & \ldots & C_{0} \\
+						\end{array}
+					 \right)
+\end{equation}
+で与えられる．したがって，ARモデルの尤度は
+\begin{eqnarray}
+	L(\theta) &=& p(y_{1}，\ldots，y_{N}\mid\theta) \nonumber \\
+						&=& (2\pi)^{-\frac{1}{2}}|\Sigma|^{-\frac{1}{2}}exp\left\{-\frac{1}{2}y^{\top}\Sigma^{-1}y \right\}
+\end{eqnarray}
+によって計算できる．しかし，この方法では$N\times N$行列$\Sigma$の逆行列や行列式の演算を伴うので，データ数$N$が大きな場合には計算が困難になる．\\
+そこで，時系列モデルの尤度を次のように条件付き確率の積で表現することにより，尤度を効率的に計算することができる．
+\begin{eqnarray}
+	\label{lh}
+	L(\theta) &=& p(y_{1}，\ldots，y_{N}\mid\theta) \nonumber \\
+						&=& p(y_{1}，\ldots，y_{N-1}\mid\theta)p(y_{N}\mid y_{1}，\ldots，y_{N-1}，\theta) \nonumber \\
+						&\vdots& \nonumber \\
+						&=& \prod_{n=1}^{N}p(y_{n}\mid y_{1}，\ldots，y_{n-1}，\theta) 
+\end{eqnarray}
+式(\ref{lh})を最大化することによりARモデルの最尤推定値$\hat{\theta}$が求められると，そのモデルのAICは
+\begin{eqnarray}
+	AIC &=& -2(最大対数尤度) +2 (パラメータ数) \nonumber \\
+			&=& -2logL(\hat{\theta}) +2(M+1)
+\end{eqnarray}
+によって計算できる．したがって，AIC最小化法によってAR次数$M$を決定するためには，予め定めた最高次数$M_{\rm max}$までのARモデルのAIC，
+すなわち$AIC_{0}，\cdots，AIC_{M_{\rm max}}$を計算し，その中で最小の値をとる次数を選択すれば良い．
+
+\begin{thebibliography}{9}
+ \renewcommand{\baselinestretch}{1.0}
+ \small
+ \bibitem{lit:gray}
+	 赤池 弘次,
+	 ``統計科学選書5 時系列解析の方法'',
+	 株式会社朝倉書店, pp.61-67, September 1998.
+ \bibitem{lit:white}
+	 北川 源四郎,
+	 ``時系列解析入門'',
+	 株式会社岩波書店, pp.13-18,pp.75-79,pp.95-98 March 2012.
+
+\end{thebibliography}
+\end{document}
