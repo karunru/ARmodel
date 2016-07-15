@@ -2,3 +2,5 @@
 *.log
 *.aux
 *.log
+*.odf
+*.dvi
